@@ -4,7 +4,20 @@ import { sendConfirmationEmail } from '../services/email';
 
 const router = express.Router();
 
-// POST /api/rsvp
+router.get('/', async (req, res) => {
+  try {
+    const rsvps = await RSVP.find().sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: rsvps.length,
+      data: rsvps,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch RSVPs' });
+  }
+});
+
 router.post('/', async (req, res) => {
   try {
     const { name, email, plusOne, allergies } = req.body;
@@ -30,6 +43,31 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to save RSVP',
+    });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await RSVP.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        error: 'RSVP not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'RSVP deleted',
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete RSVP',
     });
   }
 });
