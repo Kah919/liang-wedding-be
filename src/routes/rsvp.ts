@@ -1,49 +1,36 @@
 import express from 'express';
 import RSVP from '../models/RSVP';
-import sgMail from '@sendgrid/mail';
+import { sendConfirmationEmail } from '../services/email';
 
 const router = express.Router();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-
+// POST /api/rsvp
 router.post('/', async (req, res) => {
   try {
     const { name, email, plusOne, allergies } = req.body;
 
-    if (!name || !email || plusOne === undefined) {
-      return res.status(400).json({ error: 'Missing fields' });
-    }
+    // Save RSVP
+    const rsvp = new RSVP({ name, email, plusOne, allergies });
+    await rsvp.save();
 
-    // Save to DB
-    const rsvp = await RSVP.create({
-      name,
-      email,
-      plusOne,
-      allergies
-    });
-
-    // Send email
-    await sgMail.send({
+    // Send confirmation email
+    await sendConfirmationEmail({
       to: email,
-      from: process.env.FROM_EMAIL!,
-      subject: 'RSVP Confirmation',
-      text: `
-Hi ${name},
-
-Thanks for your RSVP!
-
-Plus One: ${plusOne ? 'Yes' : 'No'}
-Allergies: ${allergies || 'None'}
-
-See you soon!
-      `
+      name,
     });
 
-    res.json({ success: true, rsvp });
-
+    res.status(201).json({
+      success: true,
+      message: 'RSVP saved and email sent',
+      rsvp,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('RSVP Error:', err);
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save RSVP',
+    });
   }
 });
 
