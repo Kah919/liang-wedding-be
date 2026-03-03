@@ -14,8 +14,13 @@ app.use(express.json());
 // Routes
 app.use('/api/rsvp', rsvpRoutes);
 
+if (!process.env.MONGO_URI) {
+  console.error('MONGO_URI is not defined in environment variables');
+  process.exit(1);
+}
+
 // Database
-mongoose.connect(process.env.MONGO_URI!)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 

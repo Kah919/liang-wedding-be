@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
       data: rsvps,
     });
   } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
     res.status(500).json({ success: false, error: 'Failed to fetch RSVPs' });
   }
 });
@@ -21,6 +22,11 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, email, plusOne, allergies } = req.body;
+
+    if (!name || !email) {
+      res.status(400).json({ success: false, error: 'Name and email are required' });
+      return;
+    }
 
     // Save RSVP
     const rsvp = new RSVP({ name, email, plusOne, allergies });
@@ -38,8 +44,7 @@ router.post('/', async (req, res) => {
       rsvp,
     });
   } catch (err) {
-    console.error('RSVP Error:', err);
-
+    console.error(err instanceof Error ? err.message : err);
     res.status(500).json({
       success: false,
       error: 'Failed to save RSVP',
@@ -54,10 +59,8 @@ router.delete('/:id', async (req, res) => {
     const deleted = await RSVP.findByIdAndDelete(id);
 
     if (!deleted) {
-      return res.status(404).json({
-        success: false,
-        error: 'RSVP not found',
-      });
+      res.status(404).json({ success: false, error: 'RSVP not found' });
+      return;
     }
 
     res.json({
@@ -65,6 +68,7 @@ router.delete('/:id', async (req, res) => {
       message: 'RSVP deleted',
     });
   } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
     res.status(500).json({
       success: false,
       error: 'Failed to delete RSVP',
