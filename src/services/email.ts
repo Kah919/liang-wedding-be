@@ -17,7 +17,7 @@ export async function sendConfirmationEmail({ to, name }: SendEmailProps) {
       <p>We’re so excited to celebrate with you.</p>
       <p>See you at the wedding! ❤️</p>
       <br />
-      <p>- Kah & Partner</p>
+      <p>-Mike & Ari</p>
     `,
   };
 
