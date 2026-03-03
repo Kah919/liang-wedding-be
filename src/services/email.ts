@@ -15,6 +15,10 @@ export async function sendConfirmationEmail({ to, name }: SendEmailProps) {
     html: `
       <h2>Thank you for your RSVP, ${name}!</h2>
       <p>We’re so excited to celebrate with you.</p>
+      <br />
+      <p><strong>Date:</strong> September 26, 2026</p>
+      <p><strong>Location:</strong> 214 Jericho Tpke, New Hyde Park, NY 11040</p>
+      <br />
       <p>See you at the wedding! ❤️</p>
       <br />
       <p>-Mike & Ari</p>
