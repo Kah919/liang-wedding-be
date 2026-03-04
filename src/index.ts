@@ -8,8 +8,14 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: [
+    "https://liangs.netlify.app",
+    "http://localhost:5173" // for local dev
+  ],
+  methods: ["GET", "POST"],
+  credentials: true
+}));app.use(express.json());
 
 app.use('/api/rsvp', rsvpRoutes);
 
