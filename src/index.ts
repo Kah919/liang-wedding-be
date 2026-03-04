@@ -11,22 +11,29 @@ const app = express();
 app.use(cors({
   origin: [
     "https://liangs.netlify.app",
-    "http://localhost:5173" // for local dev
+    "http://localhost:5173"
   ],
   methods: ["GET", "POST"],
   credentials: true
-}));app.use(express.json());
+}));
+
+app.use(express.json());
+
+// Connect to MongoDB only when needed
+let isConnected = false;
+app.use(async (req, res, next) => {
+  if (!isConnected) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI!);
+      isConnected = true;
+    } catch (err) {
+      console.error('MongoDB connection error:', err);
+      return res.status(500).json({ error: 'Database connection failed' });
+    }
+  }
+  next();
+});
 
 app.use('/api/rsvp', rsvpRoutes);
 
-if (!process.env.MONGO_URI) {
-  console.error('MONGO_URI is not defined in environment variables');
-  process.exit(1);
-}
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error(err));
-
-// Remove app.listen and export instead
 export default app;
