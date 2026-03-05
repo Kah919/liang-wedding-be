@@ -5,11 +5,17 @@ import { sendConfirmationEmail } from '../services/email';
 
 const router = express.Router();
 
+interface RsvpBody {
+  email: string;
+  notes?: string;
+  rsvpStatus: RsvpStatus;
+  plusOnes?: { firstName: string; lastName: string }[];
+}
+
 // POST submit RSVP
 router.post('/', async (req, res) => {
   try {
-    const { email, notes, rsvpStatus, plusOnes }: { email: string; notes?: string; rsvpStatus: RsvpStatus; plusOnes?: { firstName: string; lastName: string }[] } = req.body;
-    // plusOnes = [{ firstName: 'John', lastName: 'Doe', notes: 'nuts' }]
+    const { email, notes, rsvpStatus, plusOnes } = req.body as RsvpBody;
 
     const guest = await Guest.findOne({ email });
 
@@ -25,6 +31,8 @@ router.post('/', async (req, res) => {
     }
 
     // save plus ones
+    await PlusOne.deleteMany({ guest: guest._id });
+    guest.plusOnes = [];
     if (plusOnes && plusOnes.length > 0) {
       const plusOneDocs = await PlusOne.insertMany(
         plusOnes.map((p: { firstName: string; lastName: string; }) => ({
@@ -45,6 +53,7 @@ router.post('/', async (req, res) => {
 
     res.status(200).json({ success: true, message: 'RSVP submitted!', data: guest });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, error: 'Failed to submit RSVP' });
   }
 });

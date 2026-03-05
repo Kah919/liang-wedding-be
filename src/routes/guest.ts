@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
     const guests = await Guest.find().populate('plusOnes').sort({ createdAt: -1 });
     res.json({ success: true, count: guests.length, data: guests });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, error: 'Failed to fetch guests' });
   }
 });
@@ -17,18 +18,19 @@ router.get('/', async (req, res) => {
 // POST create a guest (admin only)
 router.post('/', async (req, res) => {
   try {
-    const { firstName, lastName, email, allowedPlusOnes } = req.body;
+    const { firstName, lastName, email, allowedPlusOnes, notes } = req.body;
 
     if (!firstName || !lastName) {
       res.status(400).json({ success: false, error: 'First and last name are required' });
       return;
     }
 
-    const guest = new Guest({ firstName, lastName, email, allowedPlusOnes });
+    const guest = new Guest({ firstName, lastName, email, allowedPlusOnes, notes });
     await guest.save();
 
     res.status(201).json({ success: true, data: guest });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, error: 'Failed to create guest' });
   }
 });
@@ -48,6 +50,7 @@ router.delete('/:id', async (req, res) => {
 
     res.json({ success: true, message: 'Guest and plus ones deleted' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, error: 'Failed to delete guest' });
   }
 });
