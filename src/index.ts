@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import guestRoutes from './routes/guest';
 import rsvpRoutes from './routes/rsvp';
 
 dotenv.config();
@@ -34,6 +35,8 @@ app.use(async (req, res, next) => {
   next();
 });
 
+app.use('/api/guests', guestRoutes);
 app.use('/api/rsvp', rsvpRoutes);
+
 
 export default app;

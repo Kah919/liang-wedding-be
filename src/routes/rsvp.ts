@@ -1,78 +1,50 @@
 import express from 'express';
-import RSVP from '../models/RSVP';
+import Guest from '../models/Guest';
+import PlusOne from '../models/PlusOne';
 import { sendConfirmationEmail } from '../services/email';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
-    const rsvps = await RSVP.find().sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      count: rsvps.length,
-      data: rsvps,
-    });
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
-    res.status(500).json({ success: false, error: 'Failed to fetch RSVPs' });
-  }
-});
-
+// POST submit RSVP
 router.post('/', async (req, res) => {
   try {
-    const { name, email, plusOne, allergies } = req.body;
+    const { email, allergies, rsvpStatus, plusOnes } = req.body;
+    // plusOnes = [{ firstName: 'John', lastName: 'Doe', allergies: 'nuts' }]
 
-    if (!name || !email) {
-      res.status(400).json({ success: false, error: 'Name and email are required' });
+    const guest = await Guest.findOne({ email });
+
+    if (!guest) {
+      res.status(404).json({ success: false, error: 'Guest not found. Please contact us.' });
       return;
     }
 
-    // Save RSVP
-    const rsvp = new RSVP({ name, email, plusOne, allergies });
-    await rsvp.save();
-
-    // Send confirmation email
-    await sendConfirmationEmail({
-      to: email,
-      name,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'RSVP saved and email sent',
-      rsvp,
-    });
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to save RSVP',
-    });
-  }
-});
-
-router.delete('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const deleted = await RSVP.findByIdAndDelete(id);
-
-    if (!deleted) {
-      res.status(404).json({ success: false, error: 'RSVP not found' });
+    // validate plus one count
+    if (plusOnes && plusOnes.length > guest.allowedPlusOnes) {
+      res.status(400).json({ success: false, error: `You are only allowed ${guest.allowedPlusOnes} plus one(s)` });
       return;
     }
 
-    res.json({
-      success: true,
-      message: 'RSVP deleted',
-    });
+    // save plus ones
+    if (plusOnes && plusOnes.length > 0) {
+      const plusOneDocs = await PlusOne.insertMany(
+        plusOnes.map((p: { firstName: string; lastName: string; }) => ({
+          ...p,
+          guest: guest._id
+        }))
+      );
+      guest.plusOnes = plusOneDocs.map(p => p._id);
+    }
+
+    // update guest
+    guest.rsvpStatus = rsvpStatus;
+    await guest.save();
+
+    // send confirmation email
+    await sendConfirmationEmail({ to: guest.email, name: guest.firstName });
+
+    res.status(200).json({ success: true, message: 'RSVP submitted!', data: guest });
   } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to delete RSVP',
-    });
+    res.status(500).json({ success: false, error: 'Failed to submit RSVP' });
   }
 });
 
