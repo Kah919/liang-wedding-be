@@ -6,4 +6,4 @@ const plusOneSchema = new mongoose.Schema({
   guest: { type: mongoose.Schema.Types.ObjectId, ref: 'Guest', required: true }
 }, { timestamps: true });
 
-export default mongoose.model('Guest', plusOneSchema);
+export default mongoose.model('PlusOne', plusOneSchema);

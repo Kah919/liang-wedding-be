@@ -1,5 +1,5 @@
 import express from 'express';
-import Guest from '../models/Guest';
+import Guest, { RsvpStatus } from '../models/Guest';
 import PlusOne from '../models/PlusOne';
 import { sendConfirmationEmail } from '../services/email';
 
@@ -8,7 +8,7 @@ const router = express.Router();
 // POST submit RSVP
 router.post('/', async (req, res) => {
   try {
-    const { email, notes, rsvpStatus, plusOnes } = req.body;
+    const { email, notes, rsvpStatus, plusOnes }: { email: string; notes?: string; rsvpStatus: RsvpStatus; plusOnes?: { firstName: string; lastName: string }[] } = req.body;
     // plusOnes = [{ firstName: 'John', lastName: 'Doe', notes: 'nuts' }]
 
     const guest = await Guest.findOne({ email });
@@ -37,6 +37,7 @@ router.post('/', async (req, res) => {
 
     // update guest
     guest.rsvpStatus = rsvpStatus;
+    guest.notes = notes;
     await guest.save();
 
     // send confirmation email
