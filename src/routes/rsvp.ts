@@ -8,8 +8,8 @@ const router = express.Router();
 // POST submit RSVP
 router.post('/', async (req, res) => {
   try {
-    const { email, allergies, rsvpStatus, plusOnes } = req.body;
-    // plusOnes = [{ firstName: 'John', lastName: 'Doe', allergies: 'nuts' }]
+    const { email, notes, rsvpStatus, plusOnes } = req.body;
+    // plusOnes = [{ firstName: 'John', lastName: 'Doe', notes: 'nuts' }]
 
     const guest = await Guest.findOne({ email });
 
