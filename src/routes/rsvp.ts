@@ -6,18 +6,24 @@ import { sendConfirmationEmail } from '../services/email';
 const router = express.Router();
 
 interface RsvpBody {
-  email: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
   notes?: string;
   rsvpStatus: RsvpStatus;
+  guestsAttending?: number;
   plusOnes?: { firstName: string; lastName: string }[];
 }
 
 // POST submit RSVP
 router.post('/', async (req, res) => {
   try {
-    const { email, notes, rsvpStatus, plusOnes } = req.body as RsvpBody;
+    const { firstName, lastName, email, notes, rsvpStatus, guestsAttending, plusOnes } = req.body as RsvpBody;
 
-    const guest = await Guest.findOne({ email });
+    const guest = await Guest.findOne({
+      firstName: { $regex: new RegExp(`^${firstName}$`, 'i') },
+      lastName: { $regex: new RegExp(`^${lastName}$`, 'i') },
+    });
 
     if (!guest) {
       res.status(404).json({ success: false, error: 'Guest not found. Please contact us.' });
@@ -45,7 +51,9 @@ router.post('/', async (req, res) => {
 
     // update guest
     guest.rsvpStatus = rsvpStatus;
-    guest.notes = notes;
+    if (email) guest.email = email;
+    if (notes !== undefined) guest.notes = notes;
+    if (guestsAttending !== undefined) guest.guestsAttending = guestsAttending;
     await guest.save();
 
     // send confirmation email

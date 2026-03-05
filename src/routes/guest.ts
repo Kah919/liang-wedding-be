@@ -4,8 +4,35 @@ import PlusOne from '../models/PlusOne';
 
 const router = express.Router();
 
+// GET guest by name — used by RSVP flow to look up a guest before submission
+router.get('/lookup', async (req, res) => {
+  try {
+    const { firstName, lastName } = req.query as { firstName?: string; lastName?: string };
+
+    if (!firstName || !lastName) {
+      res.status(400).json({ success: false, error: 'firstName and lastName are required' });
+      return;
+    }
+
+    const guest = await Guest.findOne({
+      firstName: { $regex: new RegExp(`^${firstName}$`, 'i') },
+      lastName: { $regex: new RegExp(`^${lastName}$`, 'i') },
+    }).populate('plusOnes');
+
+    if (!guest) {
+      res.status(404).json({ success: false, error: 'Guest not found. Please contact us.' });
+      return;
+    }
+
+    res.json({ success: true, data: guest });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Failed to look up guest' });
+  }
+});
+
 // GET all guests
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const guests = await Guest.find().populate('plusOnes').sort({ createdAt: -1 });
     res.json({ success: true, count: guests.length, data: guests });
