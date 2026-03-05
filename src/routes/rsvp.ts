@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
     await guest.save();
 
     // send confirmation email
-    await sendConfirmationEmail({ to: guest.email, name: guest.firstName });
+    if (guest.email) await sendConfirmationEmail({ to: guest.email, name: guest.firstName });
 
     res.status(200).json({ success: true, message: 'RSVP submitted!', data: guest });
   } catch (err) {
