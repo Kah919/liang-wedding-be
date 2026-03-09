@@ -62,6 +62,37 @@ router.post('/', async (req, res) => {
   }
 });
 
+// PATCH update a guest (admin only)
+router.patch('/:id', async (req, res) => {
+  try {
+    const { firstName, lastName, email, allowedPlusOnes, notes, rsvpStatus } = req.body;
+    const updates: Record<string, unknown> = {};
+
+    if (firstName !== undefined) updates.firstName = firstName;
+    if (lastName !== undefined) updates.lastName = lastName;
+    if (email !== undefined) updates.email = email;
+    if (allowedPlusOnes !== undefined) updates.allowedPlusOnes = allowedPlusOnes;
+    if (notes !== undefined) updates.notes = notes;
+    if (rsvpStatus !== undefined) updates.rsvpStatus = rsvpStatus;
+
+    const guest = await Guest.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).populate('plusOnes');
+
+    if (!guest) {
+      res.status(404).json({ success: false, error: 'Guest not found' });
+      return;
+    }
+
+    res.json({ success: true, data: guest });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Failed to update guest' });
+  }
+});
+
 // DELETE a guest
 router.delete('/:id', async (req, res) => {
   try {
