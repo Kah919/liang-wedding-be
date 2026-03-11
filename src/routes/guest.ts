@@ -17,14 +17,14 @@ router.get('/lookup', async (req, res) => {
     const guest = await Guest.findOne({
       firstName: { $regex: new RegExp(`^${firstName}$`, 'i') },
       lastName: { $regex: new RegExp(`^${lastName}$`, 'i') },
-    }).populate('plusOnes');
+    });
 
     if (!guest) {
       res.status(404).json({ success: false, error: 'Guest not found. Please contact us.' });
       return;
     }
 
-    res.json({ success: true, data: guest });
+    res.json({ success: true, data: { _id: guest._id, firstName: guest.firstName, lastName: guest.lastName, allowedPlusOnes: guest.allowedPlusOnes, notes: guest.notes } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: 'Failed to look up guest' });
