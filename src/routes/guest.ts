@@ -61,7 +61,7 @@ router.post('/', async (req, res) => {
       return;
     }
 
-    const guest = new Guest({ firstName, lastName, email, notes });
+    const guest = new Guest({ firstName: capitalize(firstName), lastName: capitalize(lastName), email, notes });
     await guest.save();
 
     if (plusOnes && plusOnes.length > 0) {
