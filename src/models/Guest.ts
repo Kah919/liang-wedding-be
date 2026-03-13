@@ -7,7 +7,6 @@ const guestSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, unique: true, sparse: true },
-  allowedPlusOnes: { type: Number, default: 0 }, // admin sets this (0 = no plus ones allowed)
   notes: String,
   rsvpStatus: { type: String, enum: RSVP_STATUSES, default: 'pending' },
   guestsAttending: { type: Number },
