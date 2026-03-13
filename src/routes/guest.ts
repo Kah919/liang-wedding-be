@@ -4,6 +4,8 @@ import PlusOne from '../models/PlusOne';
 
 const router = express.Router();
 
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
 // GET guest by name — used by RSVP flow to look up a guest before submission
 router.get('/lookup', async (req, res) => {
   try {
@@ -64,7 +66,7 @@ router.post('/', async (req, res) => {
 
     if (plusOnes && plusOnes.length > 0) {
       const plusOneDocs = await PlusOne.insertMany(
-        plusOnes.map(p => ({ ...p, guest: guest._id }))
+        plusOnes.map(p => ({ firstName: capitalize(p.firstName), lastName: capitalize(p.lastName), guest: guest._id }))
       );
       guest.plusOnes = plusOneDocs.map(p => p._id);
       await guest.save();
