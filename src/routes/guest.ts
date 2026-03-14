@@ -27,7 +27,7 @@ router.get('/lookup', async (req, res) => {
     }
 
     await guest.populate('plusOnes');
-    res.json({ success: true, data: { _id: guest._id, firstName: guest.firstName, lastName: guest.lastName, notes: guest.notes, plusOnes: guest.plusOnes } });
+    res.json({ success: true, data: { _id: guest._id, firstName: guest.firstName, lastName: guest.lastName, email: guest.email, notes: guest.notes, plusOnes: guest.plusOnes } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: 'Failed to look up guest' });
