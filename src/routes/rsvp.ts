@@ -35,10 +35,7 @@ router.post('/', async (req, res) => {
       return;
     }
 
-    // if guest is declining, auto-decline all plus ones
-    if (rsvpStatus === 'declined') {
-      await PlusOne.updateMany({ guest: guest._id }, { rsvpStatus: 'declined' });
-    } else if (plusOnes && plusOnes.length > 0) {
+    if (plusOnes && plusOnes.length > 0) {
       await Promise.all(
         plusOnes.map(p => PlusOne.findByIdAndUpdate(p.id, { rsvpStatus: p.rsvpStatus }))
       );
