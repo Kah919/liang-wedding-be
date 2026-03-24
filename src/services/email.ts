@@ -5,24 +5,40 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 type SendEmailProps = {
   to: string;
   name: string;
+  attending: boolean;
 };
 
-export async function sendConfirmationEmail({ to, name }: SendEmailProps) {
+export async function sendConfirmationEmail({ to, name, attending }: SendEmailProps) {
+  const text = attending
+    ? `Thank you for your RSVP, ${name}! We can't wait to celebrate with you on September 26, 2026.\n\nThe Inn at New Hyde Park\n214 Jericho Tpke\nNew Hyde Park, NY 11040\n\nIf you need to update your response, reach us at mliang7766@gmail.com.\n\nWith love,\nMike & Ari`
+    : `Thank you for your RSVP, ${name}!\n\nTo update your response, please contact mliang7766@gmail.com.\n\nWith love,\nMike & Ari\n\nhttps://liangs.netlify.app`;
+
+  const html = attending
+    ? `
+      <p>Thank you for your RSVP, ${name}! We can’t wait to celebrate with you on September 26, 2026.</p>
+      <br />
+      <p>The Inn at New Hyde Park<br />214 Jericho Tpke<br />New Hyde Park, NY 11040</p>
+      <br />
+      <p>If you need to update your response, reach us at <a href="mailto:mliang7766@gmail.com">mliang7766@gmail.com</a>.</p>
+      <br />
+      <p>With love,<br />Mike &amp; Ari</p>
+    `
+    : `
+      <p>Thank you for your RSVP, ${name}!</p>
+      <br />
+      <p>To update your response, please contact <a href="mailto:mliang7766@gmail.com">mliang7766@gmail.com</a>.</p>
+      <br />
+      <p>With love,<br />Mike &amp; Ari</p>
+      <br />
+      <p><a href="https://liangs.netlify.app">WWW.MIKEANDARI.COM</a></p>
+    `;
+
   const msg = {
     to,
     from: process.env.FROM_EMAIL!,
-    subject: 'Wedding RSVP Confirmation 💍',
-    html: `
-      <h2>Thank you for your RSVP, ${name}!</h2>
-      <p>We’re so excited to celebrate with you.</p>
-      <br />
-      <p><strong>Date:</strong> September 26, 2026</p>
-      <p><strong>Location:</strong> 214 Jericho Tpke, New Hyde Park, NY 11040</p>
-      <br />
-      <p>See you at the wedding! ❤️</p>
-      <br />
-      <p>-Mike & Ari</p>
-    `,
+    subject: "Wedding RSVP Confirmation",
+    text,
+    html,
   };
 
   await sgMail.send(msg);

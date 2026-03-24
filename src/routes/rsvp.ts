@@ -47,7 +47,8 @@ router.post('/', async (req, res) => {
     if (guestsAttending !== undefined) guest.guestsAttending = guestsAttending;
     await guest.save();
 
-    if (guest.email) await sendConfirmationEmail({ to: guest.email, name: guest.firstName });
+    const anyAttending = rsvpStatus === 'attending' || (plusOnes?.some(p => p.rsvpStatus === 'attending') ?? false);
+    if (guest.email) await sendConfirmationEmail({ to: guest.email, name: guest.firstName, attending: anyAttending });
 
     await guest.populate('plusOnes');
     res.json({ success: true, message: 'RSVP submitted!', data: guest });
