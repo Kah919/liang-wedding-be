@@ -10,8 +10,8 @@ type SendEmailProps = {
 
 export async function sendConfirmationEmail({ to, name, attending }: SendEmailProps) {
   const text = attending
-    ? `Thank you for your RSVP, ${name}! We can't wait to celebrate with you on September 26, 2026.\n\nThe Inn at New Hyde Park\n214 Jericho Tpke\nNew Hyde Park, NY 11040\n\nIf you need to update your response, reach us at mliang7766@gmail.com.\n\nWith love,\nMike & Ari`
-    : `Thank you for your RSVP, ${name}!\n\nTo update your response, please contact mliang7766@gmail.com.\n\nWith love,\nMike & Ari\n\nhttps://liangs.netlify.app`;
+    ? `Thank you for your RSVP, ${name}! We can't wait to celebrate with you on September 26, 2026.\n\nThe Inn at New Hyde Park\n214 Jericho Tpke\nNew Hyde Park, NY 11040\n\nIf you need to update your response, reach us at arianaplusmichael@gmail.com.\n\nWith love,\nMike & Ari`
+    : `Thank you for your RSVP, ${name}!\n\nTo update your response, please contact arianaplusmichael@gmail.com.\n\nWith love,\nMike & Ari\n\nhttps://liangs.netlify.app`;
 
   const html = attending
     ? `
@@ -19,14 +19,14 @@ export async function sendConfirmationEmail({ to, name, attending }: SendEmailPr
       <br />
       <p>The Inn at New Hyde Park<br />214 Jericho Tpke<br />New Hyde Park, NY 11040</p>
       <br />
-      <p>If you need to update your response, reach us at <a href="mailto:mliang7766@gmail.com">mliang7766@gmail.com</a>.</p>
+      <p>If you need to update your response, reach us at <a href="mailto:arianaplusmichael@gmail.com">arianaplusmichael@gmail.com</a>.</p>
       <br />
       <p>With love,<br />Mike &amp; Ari</p>
     `
     : `
       <p>Thank you for your RSVP, ${name}!</p>
       <br />
-      <p>To update your response, please contact <a href="mailto:mliang7766@gmail.com">mliang7766@gmail.com</a>.</p>
+      <p>To update your response, please contact <a href="mailto:arianaplusmichael@gmail.com">arianaplusmichael@gmail.com</a>.</p>
       <br />
       <p>With love,<br />Mike &amp; Ari</p>
       <br />
