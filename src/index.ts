@@ -13,6 +13,7 @@ app.use(cors({
   origin: [
     "https://liangs.netlify.app",
     "https://ariandmike.to",
+    "http://ariandmike.to",
     "http://localhost:5173"
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
