@@ -8,6 +8,35 @@ type SendEmailProps = {
   attending: boolean;
 };
 
+type BlastEmailProps = {
+  recipients: { email: string; firstName: string }[];
+  subject: string;
+  message: string;
+};
+
+export async function sendBlastEmail({ recipients, subject, message }: BlastEmailProps): Promise<{ sent: number; failed: number }> {
+  let sent = 0;
+  let failed = 0;
+
+  for (const recipient of recipients) {
+    try {
+      await sgMail.send({
+        to: recipient.email,
+        from: process.env.FROM_EMAIL!,
+        subject,
+        text: message,
+        html: message.replace(/\n/g, '<br />'),
+      });
+      sent++;
+    } catch (err) {
+      console.error(`Failed to send to ${recipient.email}:`, err);
+      failed++;
+    }
+  }
+
+  return { sent, failed };
+}
+
 export async function sendConfirmationEmail({ to, name, attending }: SendEmailProps) {
   const text = attending
     ? `Thank you for your RSVP, ${name}! We can't wait to celebrate with you on September 26, 2026.\n\nThe Inn at New Hyde Park\n214 Jericho Tpke\nNew Hyde Park, NY 11040\n\nIf you need to update your response, reach us at arianaplusmichael@gmail.com.\n\nWith love,\nMike & Ari`

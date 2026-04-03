@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import guestRoutes from './routes/guest';
 import rsvpRoutes from './routes/rsvp';
+import emailRoutes from './routes/email';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use(async (req, res, next) => {
 
 app.use('/api/guests', guestRoutes);
 app.use('/api/rsvp', rsvpRoutes);
+app.use('/api/email', emailRoutes);
 
 
 export default app;
