@@ -48,7 +48,13 @@ router.post('/', async (req, res) => {
     await guest.save();
 
     const anyAttending = rsvpStatus === 'attending' || (plusOnes?.some(p => p.rsvpStatus === 'attending') ?? false);
-    if (guest.email) await sendConfirmationEmail({ to: guest.email, name: guest.firstName, attending: anyAttending });
+    if (guest.email) {
+      try {
+        await sendConfirmationEmail({ to: guest.email, name: guest.firstName, attending: anyAttending });
+      } catch (emailErr) {
+        console.error('Failed to send confirmation email:', emailErr);
+      }
+    }
 
     await guest.populate('plusOnes');
     res.json({ success: true, message: 'RSVP submitted!', data: guest });
